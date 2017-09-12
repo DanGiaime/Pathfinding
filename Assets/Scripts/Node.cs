@@ -2,15 +2,21 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Node : MonoBehaviour {
+public class Node {
 
-	// Use this for initialization
-	void Start () {
-		
+	private GameObject go;
+	private Vector2 location;
+	public bool isWall;
+
+	public Node(GameObject go, Vector2 location, bool isWall) {
+		this.go = go;
+		this.location = location;
+		this.isWall = isWall;
 	}
-	
-	// Update is called once per frame
-	void Update () {
-		
+
+	public void visit() {
+		this.isWall = true;
+		this.go.renderer.material.color = Color.red;
+
 	}
 }
