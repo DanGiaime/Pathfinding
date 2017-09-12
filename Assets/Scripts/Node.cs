@@ -2,21 +2,52 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Node {
+public class Node:MonoBehaviour {
 
 	private GameObject go;
 	private Vector2 location;
-	public bool isWall;
+	private bool isWall;
+	private List<Node> neighbors;
+	private int loc;
 
+	/// <summary>
+	/// Create a new Node object
+	/// </summary>
+	/// <param name="go">GameObject associated with this graph Node</param>
+	/// <param name="location">Location in grid of this Node</param>
+	/// <param name="isWall">If set to <c>true</c> Whether or not this node is a wall</param>
 	public Node(GameObject go, Vector2 location, bool isWall) {
 		this.go = go;
 		this.location = location;
 		this.isWall = isWall;
+		this.neighbors = new List<Node> ();
+		this.loc = 0;
+		go.AddComponent(typeof(Node));
 	}
 
-	public void visit() {
-		this.isWall = true;
-		this.go.renderer.material.color = Color.red;
+	public void Visit() {
+		this.go.GetComponent<Renderer> ().material.color = Color.red;
+	}
 
+	public void ToggleWall() {
+		this.isWall = !this.isWall;
+		if (this.isWall) {
+			this.go.GetComponent<Renderer> ().material.color = Color.black;
+			//TODO: Disconnect
+		} 
+		else {
+			this.go.GetComponent<Renderer> ().material.color = Color.white;
+			//TODO: Reconnect
+		}	
+	}
+
+	public void AddNode(Node n) {
+		neighbors.Add (n);
+	}
+
+	public Node this[int i]
+	{
+		get { return neighbors[i]; }
+		set { neighbors[i] = value; }
 	}
 }
