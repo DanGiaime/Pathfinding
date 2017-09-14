@@ -9,6 +9,10 @@ public class Graph {
 		vertices = new List<Node> ();
 	}
 
+	public List<Node> Vertices {
+		get { return this.vertices; }
+	}
+
 	public void addNode(Node n) {
 		vertices.Add (n);
 	}

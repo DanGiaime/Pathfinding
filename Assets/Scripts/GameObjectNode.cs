@@ -25,6 +25,7 @@ public class GameObjectNode : MonoBehaviour {
 	/// Toggles isWall of related Node
 	/// </summary>
 	void OnMouseDown() {
+		node.resetColor ();
 		node.ToggleWall ();
 	}
 		

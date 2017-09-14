@@ -2,13 +2,14 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Node:MonoBehaviour {
+public class Node {
 
 	private GameObject go;
 	private Vector2 location;
 	private bool isWall;
 	private List<Node> neighbors;
 	private int loc;
+	private bool isVisited;
 
 	/// <summary>
 	/// Create a new Node object
@@ -22,11 +23,30 @@ public class Node:MonoBehaviour {
 		this.isWall = isWall;
 		this.neighbors = new List<Node> ();
 		this.loc = 0;
-		go.AddComponent(typeof(Node));
+		this.isVisited = false;
 	}
 
 	public void Visit() {
 		this.go.GetComponent<Renderer> ().material.color = Color.red;
+		this.isVisited = true;
+	}
+
+	public bool IsVisited {
+		get { return this.isVisited; }
+		set { this.isVisited = value; }
+	}
+
+	public void resetColor() {
+		this.go.GetComponent<Renderer> ().material.color = Color.white;
+		this.isVisited = false;
+	}
+
+	public bool IsWall {
+		get { return isWall; }
+	}
+
+	public void clearNeighbors() {
+		neighbors.Clear ();
 	}
 
 	public void ToggleWall() {
