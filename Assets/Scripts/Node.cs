@@ -36,6 +36,10 @@ public class Node {
 		set { this.isVisited = value; }
 	}
 
+	public List<Node> Neighbors {
+		get { return this.neighbors; }
+	}
+
 	public void resetColor() {
 		this.go.GetComponent<Renderer> ().material.color = Color.white;
 		this.isVisited = false;
