@@ -24,19 +24,26 @@ public class TileSpawner : MonoBehaviour {
 	/// </summary>
 	public GameObject sceneManager;
 
+	static string[] algorithms = new string[] { "BFS", "DFS", "Dijkstra's" };
+	static Rect algorithmsPosition = new Rect(10, 10, 100, 75);
+	public int selected;
+
+
 	private Node[,] grid;
 	private Graph graph;
 	private Node currPathNode;
+    private Node currGoalNode;
 
 	// Spawn initial tiles and create graph
 	void Start () {
+		this.selected = 0;
 		grid = new Node[width, height];
 		graph = new Graph ();
 		createGrid ();
 
 		Destroy (tile);
 		currPathNode = grid [0, 0];
-			
+        currGoalNode = grid [width - 1, height -1];	
 	}
 
 	/// <summary>
@@ -74,14 +81,14 @@ public class TileSpawner : MonoBehaviour {
 					Node nodeAbove = grid [i, j + 1];
 					if(!currNode.IsWall && !nodeAbove.IsWall) {
 						currNode.AddNode (nodeAbove);
-						//nodeAbove.AddNode (currNode);
+						nodeAbove.AddNode (currNode);
 					}
 				}
 				if (i + 1 < width) {
 					Node nodeRight = grid [i + 1, j];
 					if (!currNode.IsWall && !nodeRight.IsWall) {
 						currNode.AddNode (nodeRight);
-						//nodeRight.AddNode (currNode);
+						nodeRight.AddNode (currNode);
 					}
 				}
 			}
@@ -96,13 +103,33 @@ public class TileSpawner : MonoBehaviour {
 	}
 
 	void runPath () {
+
+		// Recreate graph with current walls
+		createGraph ();
+
 		//Run pathfinding algorithm
-		for (int i = 0; i < 100; i++) {
-			if (currPathNode != null) {
-				currPathNode.Visit ();
-				currPathNode = currPathNode [0];
-			}
+		graph.StartNode = currPathNode;
+        graph.TargetNode = currGoalNode;
+		List<Node> path;
+
+		switch(this.selected) {
+			case 0:
+				path = Algorithms.BFS (graph);
+				break;
+			case 1:
+				path = Algorithms.DFS (graph);
+				break;
+			case 2:
+				path = Algorithms.Dijkstras (graph);
+				break;
+			default:
+				path = new List<Node> ();
+				break;
 		}
+        foreach (Node n in path) {
+			n.HighLight();
+        }
+        Debug.Log(path.Count);
 	}
 
 	void erasePath() {
@@ -114,12 +141,9 @@ public class TileSpawner : MonoBehaviour {
 	}
 
 	void OnGUI () {
-//		if (GUI.Button (new Rect (10, 70, 100, 30), "Create Graph")) {
-//			createGraph ();
-//		}
+		this.selected = GUI.SelectionGrid(algorithmsPosition, selected, algorithms, 1, GUI.skin.toggle);
 
 		if (GUI.Button (new Rect (10, 100, 100, 30), "Run algorithm")) {
-			createGraph ();
 			runPath ();
 		}
 

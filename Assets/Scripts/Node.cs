@@ -1,8 +1,9 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Node {
+public class Node : System.IEquatable<Node>{
 
 	private GameObject go;
 	private Vector2 location;
@@ -17,7 +18,7 @@ public class Node {
 	/// <param name="go">GameObject associated with this graph Node</param>
 	/// <param name="location">Location in grid of this Node</param>
 	/// <param name="isWall">If set to <c>true</c> Whether or not this node is a wall</param>
-	public Node(GameObject go, Vector2 location, bool isWall) {
+    public Node(GameObject go, Vector2 location, bool isWall) {
 		this.go = go;
 		this.location = location;
 		this.isWall = isWall;
@@ -28,6 +29,11 @@ public class Node {
 
 	public void Visit() {
 		this.go.GetComponent<Renderer> ().material.color = Color.red;
+		this.isVisited = true;
+	}
+		
+	public void HighLight() {
+		this.go.GetComponent<Renderer> ().material.color = Color.green;
 		this.isVisited = true;
 	}
 
@@ -69,7 +75,12 @@ public class Node {
 		neighbors.Add (n);
 	}
 
-	public Node this[int i]
+    public bool Equals(Node other)
+    {
+        return (this == other);
+    }
+
+    public Node this[int i]
 	{
 		get { return neighbors[i]; }
 		set { neighbors[i] = value; }

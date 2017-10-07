@@ -3,8 +3,9 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProductVersion>8.0.30703</ProductVersion>
+    <ProductVersion>10.0.20506</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
+    <RootNamespace></RootNamespace>
     <ProjectGuid>{51620EE3-3DEA-7333-6E7A-6011D65ABAFB}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
@@ -33,24 +34,27 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
+    <Reference Include="System.XML" />
     <Reference Include="System.Core" />
     <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="UnityEngine">
-      <HintPath>..\..\..\..\Applications\Unity 560f3\Unity 560f3.app\Contents\Managed\UnityEngine.dll</HintPath>
+      <HintPath>/Applications/Unity 560f3/Unity 560f3.app/Contents/Managed/UnityEngine.dll</HintPath>
     </Reference>
     <Reference Include="UnityEditor">
-      <HintPath>..\..\..\..\Applications\Unity 560f3\Unity 560f3.app\Contents\Managed\UnityEditor.dll</HintPath>
+      <HintPath>/Applications/Unity 560f3/Unity 560f3.app/Contents/Managed/UnityEditor.dll</HintPath>
     </Reference>
-    <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Assets\Scripts\Algorithms.cs" />
-    <Compile Include="Assets\Scripts\GameObjectNode.cs" />
-    <Compile Include="Assets\Scripts\Graph.cs" />
-    <Compile Include="Assets\Scripts\Node.cs" />
-    <Compile Include="Assets\Scripts\TileSpawner.cs" />
-    <Compile Include="Assets\Scripts\PriorityQueue.cs" />
+     <Compile Include="Assets\Scripts\Algorithms.cs" />
+     <Compile Include="Assets\Scripts\GameObjectNode.cs" />
+     <Compile Include="Assets\Scripts\Graph.cs" />
+     <Compile Include="Assets\Scripts\Heap.cs" />
+     <Compile Include="Assets\Scripts\Node.cs" />
+     <Compile Include="Assets\Scripts\PriorityQueue.cs" />
+     <Compile Include="Assets\Scripts\Queue.cs" />
+     <Compile Include="Assets\Scripts\Stack.cs" />
+     <Compile Include="Assets\Scripts\TileSpawner.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
@@ -60,4 +64,5 @@
   <Target Name="AfterBuild">
   </Target>
   -->
+  
 </Project>
