@@ -42,6 +42,10 @@ public class Node : System.IEquatable<Node>{
 		set { this.isVisited = value; }
 	}
 
+	public Vector2 Location {
+		get { return this.location; }
+	}
+
 	public List<Node> Neighbors {
 		get { return this.neighbors; }
 	}

@@ -24,7 +24,7 @@ public class TileSpawner : MonoBehaviour {
 	/// </summary>
 	public GameObject sceneManager;
 
-	static string[] algorithms = new string[] { "BFS", "DFS", "Dijkstra's" };
+	static string[] algorithms = new string[] { "BFS", "DFS", "Dijkstra's", "AStar"};
 	static Rect algorithmsPosition = new Rect(10, 10, 100, 75);
 	public int selected;
 
@@ -104,14 +104,15 @@ public class TileSpawner : MonoBehaviour {
 
 	void runPath () {
 
-		// Recreate graph with current walls
+		// Recreate graph given current walls
 		createGraph ();
 
-		//Run pathfinding algorithm
+		//Set up needed initial nodes
 		graph.StartNode = currPathNode;
         graph.TargetNode = currGoalNode;
 		List<Node> path;
 
+		//Run pathfinding algorithm
 		switch(this.selected) {
 			case 0:
 				path = Algorithms.BFS (graph);
@@ -120,16 +121,23 @@ public class TileSpawner : MonoBehaviour {
 				path = Algorithms.DFS (graph);
 				break;
 			case 2:
-				path = Algorithms.Dijkstras (graph);
+				path = Algorithms.Dijkstras(graph);
+				break;
+			case 3:
+				path = Algorithms.AStar(graph);
 				break;
 			default:
 				path = new List<Node> ();
 				break;
 		}
+
+		//Highlight path
         foreach (Node n in path) {
 			n.HighLight();
         }
-        Debug.Log(path.Count);
+
+		//Denote length of path taken
+		Debug.Log("Algorithm: " + algorithms[selected] + ", Length of path taken: " + path.Count);
 	}
 
 	void erasePath() {

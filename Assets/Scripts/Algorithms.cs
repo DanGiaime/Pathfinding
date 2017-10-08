@@ -5,28 +5,57 @@ using AssemblyCSharp;
 
 public class Algorithms {
 
+    public delegate float Heuristic(Node from, Node to);
+
+    private static float Distance(Node from, Node to) {
+		return Vector2.Distance(from.Location, to.Location);
+    }
+
+	/// <summary>
+	/// Performs AStar on the given graph.
+	/// </summary>
+	/// <returns>The star.</returns>
+	/// <param name="g">The green component.</param>
+	public static List<Node> AStar(Graph g)
+	{
+		Heap<Node, float> structure = new Heap<Node, float>();
+		return Search(g, structure, Distance);
+	}
+
+	/// <summary>
+	/// Performs Dijkstra's Algorithm on the given graph.
+	/// </summary>
+	/// <param name="g">The green component.</param>
 	public static List<Node> Dijkstras(Graph g)
 	{
-		Heap<Node, int> structure = new Heap<Node, int>();
-		return Search(g, structure);
+		Heap<Node, float> structure = new Heap<Node, float>();
+		return Search(g, structure, null);
 	}
 
+	/// <summary>
+	/// Performs a Breadth First Search on the given graph.
+	/// </summary>
+	/// <param name="g">The green component.</param>
 	public static List<Node> BFS(Graph g)
 	{
-		Queue<Node, int> structure = new Queue<Node, int>();
-		return Search(g, structure);
+		Queue<Node, float> structure = new Queue<Node, float>();
+		return Search(g, structure, null);
 	}
 
+	/// <summary>
+	/// Performs a Depth First Search on the given graph.
+	/// </summary>
+	/// <param name="g">The green component.</param>
     public static List<Node> DFS(Graph g) {
-        Stack<Node, int> structure = new Stack<Node, int>();
-        return Search(g, structure);
+        Stack<Node, float> structure = new Stack<Node, float>();
+        return Search(g, structure, null);
     }
 
 	/// <summary>
 	/// Performs Search on the specified graph.
 	/// </summary>
 	/// <param name="graph">Graph.</param>
-	private static List<Node> Search(Graph graph, IPriorityQueue<Node, int> unvisited)
+    private static List<Node> Search(Graph graph, IPriorityQueue<Node, float> unvisited, Heuristic heuristic)
     {
 		//TODO: error check
 
@@ -36,12 +65,18 @@ public class Algorithms {
 		Node target = graph.TargetNode;
 
 		//Create necessary lists for any pathfinding
+
+        //List of nodes we've visited
 		Dictionary<Node, Node> visited = new Dictionary<Node, Node>();
+
+        //List of Node: Node that came before it
 		Dictionary<Node, Node> previous = new Dictionary<Node, Node>();
-        Dictionary<Node, int> finalDists = new Dictionary<Node, int>();
+
+        //Distances of visited Nodes
+        Dictionary<Node, float> finalDists = new Dictionary<Node, float>();
 
 		//Set up initial values
-		int currDist = 0;
+		float currDist = 0;
 		unvisited.Add (curr, currDist);
 		previous[graph.StartNode] = graph.StartNode;
 
@@ -49,7 +84,7 @@ public class Algorithms {
 		while(visited.ContainsKey(target) == false) {
 
 			//Grab the next node and it's distance
-			KeyValuePair<Node, int> info = unvisited.Next();
+			KeyValuePair<Node, float> info = unvisited.Next();
 			curr = info.Key;
 			currDist = info.Value;
             visited.Add(curr, previous[curr]);
@@ -62,18 +97,21 @@ public class Algorithms {
 				//Check if we've seen this node before
 				if (!visited.ContainsKey(neighbor)) {
 
-                    //Could add edges here if instead of 1
-                    if (unvisited.ContainsKey(neighbor))
+					float heur = (heuristic == null) ? 1 : heuristic(neighbor, target) + 1;
+
+					//Could add edges here if instead of 1
+					if (unvisited.ContainsKey(neighbor))
                     {
-						if (finalDists[curr] + 1 < unvisited[neighbor] && unvisited is Heap<Node, int>)
+                        //If Dijkstras/AStar we want to update
+                        if (finalDists[curr] + heur < unvisited[neighbor] && unvisited is Heap<Node, int>)
                         {
-                            unvisited[neighbor] = finalDists[curr] + 1;
+                            unvisited[neighbor] = finalDists[curr] + heur;
 							previous[neighbor] = curr;
 						}
                     }
                     else
                     {
-                        unvisited.Add(neighbor, finalDists[curr] + 1);
+                        unvisited.Add(neighbor, finalDists[curr] + heur);
                         previous.Add(neighbor, curr);
                     }
                 }

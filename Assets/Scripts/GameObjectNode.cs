@@ -24,6 +24,13 @@ public class GameObjectNode : MonoBehaviour {
 	/// <summary>
 	/// Toggles isWall of related Node
 	/// </summary>
+	void OnMouseEnter() {
+		if (Input.GetMouseButton(0)) {
+			node.resetColor ();
+			node.ToggleWall ();
+		}
+	}
+
 	void OnMouseDown() {
 		node.resetColor ();
 		node.ToggleWall ();
