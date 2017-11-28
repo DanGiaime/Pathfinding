@@ -24,7 +24,7 @@ public class TileSpawner : MonoBehaviour {
 	/// </summary>
 	public GameObject sceneManager;
 
-	static string[] algorithms = new string[] { "BFS", "DFS", "Dijkstra's", "AStar"};
+	static string[] algorithms = new string[] { "BFS", "DFS", "Dijkstra's", "AStar", "IDDFS"};
 	static Rect algorithmsPosition = new Rect(10, 10, 100, 75);
 	public int selected;
 
@@ -122,29 +122,42 @@ public class TileSpawner : MonoBehaviour {
 				break;
 			case 2:
 				path = Algorithms.Dijkstras(graph);
-				break;
-			case 3:
-				path = Algorithms.AStar(graph);
-				break;
+                break;
+            case 3:
+                path = Algorithms.AStar(graph);
+                break;
+            case 4:
+                path = Algorithms.IDDFS(graph, 200);
+                break;
 			default:
 				path = new List<Node> ();
 				break;
 		}
 
-		//Highlight path
-        foreach (Node n in path) {
-			n.HighLight();
+        //Highlight path
+        if (path != null)
+        {
+            foreach (Node n in path)
+            {
+                n.HighLight();
+            }
+
+            //Denote length of path taken
+            Debug.Log("Algorithm: " + algorithms[selected] + ", Length of path taken: " + path.Count);
+        }
+        else {
+            Debug.Log("No path found");
         }
 
-		//Denote length of path taken
-		Debug.Log("Algorithm: " + algorithms[selected] + ", Length of path taken: " + path.Count);
+
 	}
 
 	void erasePath() {
 		foreach (Node n in graph.Vertices) {
-			if (n.IsVisited) {
-				n.resetColor ();
-			}
+            if (!n.IsWall)
+            {
+                n.resetColor();
+            }
 		}
 	}
 

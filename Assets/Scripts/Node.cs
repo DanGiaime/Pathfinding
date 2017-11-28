@@ -11,6 +11,9 @@ public class Node : System.IEquatable<Node>{
 	private List<Node> neighbors;
 	private int loc;
 	private bool isVisited;
+    public int uid;
+
+    static int id = 0;
 
 	/// <summary>
 	/// Create a new Node object
@@ -25,6 +28,8 @@ public class Node : System.IEquatable<Node>{
 		this.neighbors = new List<Node> ();
 		this.loc = 0;
 		this.isVisited = false;
+        this.uid = Node.id;
+        id++;
 	}
 
 	public void Visit() {

@@ -11,6 +11,57 @@ public class Algorithms {
 		return Vector2.Distance(from.Location, to.Location);
     }
 
+    public static List<Node> IDDFS(Graph g, int length)
+    {
+        Dictionary<Node, Node> visited;
+        for (int i = 0; i < length; i++)
+        {
+            visited = new Dictionary<Node, Node>();
+            Debug.Log("Target: " + g.TargetNode.uid);
+            foreach (Node n in g.Vertices)
+            {
+                n.IsVisited = false;
+            }
+            List<Node> path = DLS(g.StartNode, g.TargetNode, i);
+            Debug.Log("IDDFS " + i);
+            if (path != null)
+            {
+                Debug.Log("Path found");
+                return path;
+            }
+        }
+
+        return null;
+    }
+
+    private static List<Node> DLS(Node currNode, Node targetNode, int depth)
+    {
+        if (depth == 0 && currNode == targetNode) {
+            Debug.Log("FOUND");
+            currNode.Visit();
+            return new List<Node>(){currNode};
+        }
+        else if (depth > 0)
+        {
+            List<Node> found;
+            currNode.Visit();
+            foreach (Node neighbor in currNode.Neighbors)
+            {
+                if (!neighbor.IsVisited)
+                {
+                    found = DLS(neighbor, targetNode, depth - 1);
+                    if (found != null)
+                    {
+                        found.Add(currNode);
+                        return found;
+                    }
+                }
+            }
+        }
+
+        return null;
+    }
+
 	/// <summary>
 	/// Performs AStar on the given graph.
 	/// </summary>
@@ -119,6 +170,7 @@ public class Algorithms {
 
 		}
 
+		//Construct actual path
         curr = graph.TargetNode;
         while (curr != graph.StartNode)
         {
