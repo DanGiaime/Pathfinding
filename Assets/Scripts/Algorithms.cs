@@ -62,103 +62,186 @@ public class Algorithms {
         return null;
     }
 
+    /// <summary>
+    /// Performs a DFS recursively (no stack)
+    /// </summary>
+    /// <returns>The path.</returns>
+    /// <param name="currNode">Curr node being expanded.</param>
+    /// <param name="targetNode">Target node.</param>
+    public static List<Node> RecursiveDFS(Node currNode, Node targetNode)
+    {
+        if (currNode == targetNode)
+        {
+            Debug.Log("FOUND");
+            currNode.Visit();
+            return new List<Node>() { currNode };
+        }
+        else
+        {
+            List<Node> found;
+            currNode.Visit();
+            foreach (Node neighbor in currNode.Neighbors)
+            {
+                if (!neighbor.IsVisited)
+                {
+                    found = RecursiveDFS(neighbor, targetNode);
+                    if (found != null)
+                    {
+                        found.Add(currNode);
+                        return found;
+                    }
+                }
+            }
+        }
+        return null;
+    }
+
+
 	/// <summary>
 	/// Performs AStar on the given graph.
 	/// </summary>
 	/// <returns>The star.</returns>
-	/// <param name="g">The green component.</param>
-	public static List<Node> AStar(Graph g)
+    /// <param name="g">The graph to search.</param>
+    public static GraphState AStar(Graph g, bool runAlgorithm = true)
 	{
 		Heap<Node, float> structure = new Heap<Node, float>();
-		return Search(g, structure, Distance);
+        return runAlgorithm ? Search(g, structure, Distance) : InitAlgorithm(g, structure, Distance);
 	}
 
 	/// <summary>
 	/// Performs Dijkstra's Algorithm on the given graph.
 	/// </summary>
-	/// <param name="g">The green component.</param>
-	public static List<Node> Dijkstras(Graph g)
+	/// <param name="g">The graph to search.</param>
+    public static GraphState Dijkstras(Graph g, bool runAlgorithm = true)
 	{
 		Heap<Node, float> structure = new Heap<Node, float>();
-		return Search(g, structure, null);
+        return runAlgorithm ? Search(g, structure, null) : InitAlgorithm(g, structure, null);
 	}
 
 	/// <summary>
 	/// Performs a Breadth First Search on the given graph.
 	/// </summary>
-	/// <param name="g">The green component.</param>
-	public static List<Node> BFS(Graph g)
+    /// <param name="g">The graph to search.</param>
+    public static GraphState BFS(Graph g, bool runAlgorithm = true)
 	{
 		Queue<Node, float> structure = new Queue<Node, float>();
-		return Search(g, structure, null);
+        return runAlgorithm ? Search(g, structure, null) : InitAlgorithm(g, structure, null);
 	}
 
 	/// <summary>
 	/// Performs a Depth First Search on the given graph.
+    /// Uses a stack.
 	/// </summary>
-	/// <param name="g">The green component.</param>
-    public static List<Node> DFS(Graph g) {
+    /// <param name="g">The graph to search.</param>
+    public static GraphState DFS(Graph g, bool runAlgorithm = true) {
         Stack<Node, float> structure = new Stack<Node, float>();
-        return Search(g, structure, null);
+        return runAlgorithm ? Search(g, structure, null) : InitAlgorithm(g, structure, null);
     }
 
 	/// <summary>
 	/// Performs Search on the specified graph.
 	/// </summary>
 	/// <param name="graph">Graph.</param>
-    private static List<Node> Search(Graph graph, IPriorityQueue<Node, float> unvisited, Heuristic heuristic)
+    private static GraphState Search(Graph graph, IPriorityQueue<Node, float> unvisited, Heuristic heuristic)
     {
-		//TODO: error check
+        //TODO: error check
+        GraphState currState = InitAlgorithm(graph, unvisited, heuristic);
 
-		//Initial setup from graph
+        //Loop until we've hit our target
+        bool done = false;
+        while (!done) {
+            currState = Step(currState);
+            done = currState.isComplete;
+        }
+
+        return ConstructPath(currState);
+    }
+
+    private static GraphState InitAlgorithm(Graph graph, IPriorityQueue<Node, float> unvisited, Heuristic heur) {
+        //Initial setup from graph
         List<Node> solution = new List<Node>();
         Node curr = graph.StartNode;
-		Node target = graph.TargetNode;
+        Node target = graph.TargetNode;
 
-		//Create necessary lists for any pathfinding
+        //Create necessary lists for any pathfinding
 
         //List of nodes we've visited
-		Dictionary<Node, Node> visited = new Dictionary<Node, Node>();
+        Dictionary<Node, Node> visited = new Dictionary<Node, Node>();
 
         //List of Node: Node that came before it
-		Dictionary<Node, Node> previous = new Dictionary<Node, Node>();
+        Dictionary<Node, Node> previous = new Dictionary<Node, Node>();
 
         //Distances of visited Nodes
         Dictionary<Node, float> finalDists = new Dictionary<Node, float>();
 
-		//Set up initial values
-		float currDist = 0;
-		unvisited.Add (curr, currDist);
-		previous[graph.StartNode] = graph.StartNode;
+        //Set up initial values
+        float currDist = 0;
+        unvisited.Add(curr, currDist);
+        previous[graph.StartNode] = graph.StartNode;
 
-		//Loop until we've hit our target
-		while(visited.ContainsKey(target) == false) {
+        GraphState startState = new GraphState(graph, unvisited, visited, previous, finalDists, heur, target, null);
 
-			//Grab the next node and it's distance
-			KeyValuePair<Node, float> info = unvisited.Next();
-			curr = info.Key;
-			currDist = info.Value;
+        return startState;
+
+    }
+
+    private static GraphState ConstructPath(GraphState state) {
+        Graph graph = state.graph;
+        //Construct actual path
+        Node curr = graph.TargetNode;
+        List<Node> solution = new List<Node>();
+
+        while (curr != graph.StartNode)
+        {
+            solution.Add(curr);
+            curr = state.visited[curr];
+        }
+        solution.Add(curr);
+        state.solution = solution;
+
+        return state;
+    }
+
+    public static GraphState Step(GraphState state) {
+        IPriorityQueue<Node, float> unvisited = state.unvisited;
+        Dictionary<Node, Node> visited = state.visited;
+        Dictionary<Node, Node> previous = state.previous;
+        Dictionary<Node, float> finalDists = state.finalDists;
+        Algorithms.Heuristic heuristic = state.heuristic;
+        List<Node> solution = state.solution;
+        Node target = state.target;
+        Graph graph = state.graph;
+
+
+        if (visited.ContainsKey(target) == false)
+        {
+            //Grab the next node and it's distance
+            KeyValuePair<Node, float> info = unvisited.Next();
+            Node curr = info.Key;
+            float currDist = info.Value;
             visited.Add(curr, previous[curr]);
-            finalDists.Add (curr, currDist);
+            finalDists.Add(curr, currDist);
             curr.Visit();
 
-			//Add new nodes to unvisited 
-			foreach (Node neighbor in curr.Neighbors) {
+            //Add new nodes to unvisited 
+            foreach (Node neighbor in curr.Neighbors)
+            {
 
-				//Check if we've seen this node before
-				if (!visited.ContainsKey(neighbor)) {
+                //Check if we've seen this node before
+                if (!visited.ContainsKey(neighbor))
+                {
 
-					float heur = (heuristic == null) ? 1 : heuristic(neighbor, target) + 1;
+                    float heur = (heuristic == null) ? 1 : heuristic(neighbor, target) + 1;
 
-					//Could add edges here if instead of 1
-					if (unvisited.ContainsKey(neighbor))
+                    //Could add edges here if instead of 1
+                    if (unvisited.ContainsKey(neighbor))
                     {
                         //If Dijkstras/AStar we want to update
                         if (finalDists[curr] + heur < unvisited[neighbor] && unvisited is Heap<Node, int>)
                         {
                             unvisited[neighbor] = finalDists[curr] + heur;
-							previous[neighbor] = curr;
-						}
+                            previous[neighbor] = curr;
+                        }
                     }
                     else
                     {
@@ -166,20 +249,14 @@ public class Algorithms {
                         previous.Add(neighbor, curr);
                     }
                 }
-			}
-
-		}
-
-		//Construct actual path
-        curr = graph.TargetNode;
-        while (curr != graph.StartNode)
-        {
-            solution.Add(curr);
-            curr = visited[curr];
+            }
         }
-        solution.Add(curr);
-
-        return solution;
+        GraphState currState = new GraphState(graph, unvisited, visited, previous, finalDists, heuristic, target, null);
+        currState.isComplete = visited.ContainsKey(target);
+        if(currState.isComplete) {
+            ConstructPath(currState);
+        }
+        return currState;
     }
 
 
