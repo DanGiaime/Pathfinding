@@ -69,7 +69,7 @@ public class TileSpawner : MonoBehaviour {
 		Vector3 startPos = tile.transform.position;
 		for (int i = 0; i < width; i++) {
 			for (int j = 0; j < height; j++) {
-				GameObject go = Instantiate (tile, startPos + new Vector3 (i, j, 0), Quaternion.identity);
+				GameObject go = Instantiate (tile, startPos + new Vector3 (i * tile.transform.localScale.x*1.1f, j * tile.transform.localScale.y*1.1f, 0), Quaternion.identity);
 				grid[i, j] = new Node (go, new Vector2(i, j), false);
 				graph.addNode (grid[i, j]);
 				go.AddComponent (typeof(GameObjectNode));
@@ -193,7 +193,7 @@ public class TileSpawner : MonoBehaviour {
 	void OnGUI () {
 		this.selected = GUI.SelectionGrid(algorithmsPosition, selected, algorithms, 1, GUI.skin.toggle);
 
-        runFullAlgorithm = GUI.Toggle(new Rect(10, 220, 100, 30), runFullAlgorithm, "Run Full Algorithm");
+        runFullAlgorithm = GUI.Toggle(new Rect(10, 220, 150, 30), runFullAlgorithm, "Run Full Algorithm");
 
 		if (GUI.Button (new Rect (10, 160, 100, 30), "Run algorithm")) {
 			runPath ();
